@@ -1,0 +1,18 @@
+{
+    "extends": "@vue/tsconfig/tsconfig.json",
+    "compilerOptions": {
+        "types": ["vite/client", "node"],
+        "paths": {
+            "@/*": ["./resources/src/*"],
+            "ziggy/*": ["./vendor/tightenco/ziggy/src/js/*"],
+            "ziggy": ["./vendor/tightenco/ziggy/src/js/index.d.ts"]
+        }
+    },
+    "include": [
+        "resources/src/**/*.d.ts",
+        "resources/src/**/*.ts",
+        "resources/src/**/*.js",
+        "resources/src/**/*.vue"
+    ],
+    "references": [{ "path": "./tsconfig.node.json" }]
+}

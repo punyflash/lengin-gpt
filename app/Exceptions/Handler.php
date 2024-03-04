@@ -3,6 +3,9 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,5 +29,25 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $e)
+    {
+        $response = parent::render($request, $e);
+
+        if ($response->getStatusCode() === 419) {
+            return Redirect::back()->with('warning', $e->getMessage());
+        }
+
+        if (App::isProduction() && in_array($response->getStatusCode(), [500, 503, 404, 403])) {
+            $code = $response->getStatusCode();
+            $message = trans("http-statuses.$code");
+
+            return Inertia::render('Error', compact('code', 'message'))
+                ->toResponse($request)
+                ->setStatusCode($response->getStatusCode());
+        }
+
+        return $response;
     }
 }
