@@ -9,6 +9,7 @@ export interface Chat {
 export interface Message {
     id?: number;
     chatId: number;
+    role: string;
     content: string;
     createdAt?: number;
 }
@@ -22,7 +23,7 @@ export class Database extends Dexie {
 
         this.version(1).stores({
             chats: "++id, name, createdAt",
-            messages: "++id, chatId, content, createdAt",
+            messages: "++id, chatId, role, content, createdAt",
         });
     }
 }

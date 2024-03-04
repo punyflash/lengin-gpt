@@ -14,6 +14,7 @@ export default {
         daisyui,
     ],
     daisyui: {
+        logs: false,
         themes: true,
     }
 }

@@ -46,7 +46,9 @@ class RouteServiceProvider extends ServiceProvider
 
         if ($limit = config('openai.limit')) {
             RateLimiter::for('openai', fn (Request $request) =>
-                Limit::perDay($limit)->by($identify($request))
+                Limit::perDay($limit)->by($identify($request))->response(
+                    fn() => redirect()->back()->with('error', trans("You've exceeded the maximum number of :limit requests per day allowed. Please come back tomorrow!", compact('limit'))),
+                )
             );
         }
     }
