@@ -13,6 +13,8 @@ createInertiaApp({
             props.initialPage.props?.ziggy as Config | undefined,
         );
 
+        console.log("ziggyConfig", ziggyConfig);
+
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue, ziggyConfig)

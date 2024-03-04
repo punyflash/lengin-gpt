@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,4 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::inertia('/', 'Home');
+Route::resource('chat', ChatsController::class)
+    ->only(['index', 'update', 'show']);
+Route::redirect('/', '/chat');

@@ -2,6 +2,6 @@
 
 return [
     'groups' => [
-        'app' => ['app.*'],
+        'app' => ['chat.*'],
     ],
 ];
