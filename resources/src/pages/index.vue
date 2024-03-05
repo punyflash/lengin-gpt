@@ -18,12 +18,14 @@ async function submit() {
 
     loading.value = true;
 
-    const { chatId } = await database.createChat({
+    const detail = await database.createChat({
         content: message.value,
         role: "user",
     });
 
-    router.push(`/chat/${chatId}`);
+    router.push(`/chat/${detail.chatId}`).then(() => {
+        window.dispatchEvent(new CustomEvent("message:created", { detail }));
+    });
 }
 </script>
 

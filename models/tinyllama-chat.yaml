@@ -16,7 +16,7 @@ template:
 
   completion: |
     {{.Input}}
-context_size: 4096
+context_size: 16384
 f16: true
 stopwords:
 - <|im_end|>
