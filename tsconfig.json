@@ -1,11 +1,9 @@
 {
     "extends": "@vue/tsconfig/tsconfig.json",
     "compilerOptions": {
-        "types": ["vite/client", "node"],
+        "types": ["vite/client", "unplugin-vue-router/client", "node"],
         "paths": {
-            "@/*": ["./resources/src/*"],
-            "ziggy/*": ["./vendor/tightenco/ziggy/src/js/*"],
-            "ziggy": ["./vendor/tightenco/ziggy/src/js/index.d.ts"]
+            "@/*": ["./resources/src/*"]
         }
     },
     "include": [

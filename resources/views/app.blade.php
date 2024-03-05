@@ -5,9 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         @vite('resources/src/app.ts')
-        @inertiaHead
     </head>
     <body>
-        @inertia
+        <div id="app" data-model="{{ config('openai.model') }}"></div>
     </body>
 </html>

@@ -1,25 +1,11 @@
+import App from "@/App.vue";
 import "@/app.css";
-import { progress, resolve, title, ziggy } from "@/setup";
-import { createInertiaApp } from "@inertiajs/vue3";
-import { createApp, h } from "vue";
-import { ZiggyVue, type Config } from "ziggy";
+import { createApp } from "vue";
+import { head, router } from "./utils";
 
-createInertiaApp({
-    title,
-    resolve,
-    progress,
-    setup({ el, App, props, plugin }) {
-        const ziggyConfig = ziggy(
-            props.initialPage.props?.ziggy as Config | undefined,
-        );
+const el = document.getElementById("app")!;
 
-        console.log("ziggyConfig", ziggyConfig);
-
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .use(ZiggyVue, ziggyConfig)
-            .mount(el);
-
-        delete (el as HTMLElement).dataset?.page;
-    },
-});
+createApp(App, { ...el.dataset })
+    .use(router)
+    .use(head)
+    .mount(el);

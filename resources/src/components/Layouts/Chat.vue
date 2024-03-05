@@ -1,44 +1,62 @@
-<script lang="ts">
-import { liveQuery } from "dexie";
-import { Link } from "@inertiajs/vue3";
-import { useObservable } from "@vueuse/rxjs";
+<script setup lang="ts">
 import LenginLogoSvg from "@/components/SVG/LenginLogo.svg.vue";
 import TrashIconSvg from "@/components/SVG/TrashIcon.svg.vue";
-import db, { type Chat } from "@/database";
+import { router } from "@/utils";
+import db, { type Chat } from "@/utils/database";
+import { trunc } from "@/utils/helpers";
+import { useRoute } from "vue-router";
 
-export default {
-    components: {
-        Link,
-        LenginLogoSvg,
-        TrashIconSvg,
+const route = useRoute();
+const { model } = defineProps({
+    model: {
+        type: String,
+        default: null,
     },
-    setup() {
-        return {
-            chats: useObservable<Chat[]>(
-                // @ts-expect-error ts(2345)
-                liveQuery(() =>
-                    db.chats.orderBy("createdAt").reverse().limit(10).toArray(),
-                ),
-            ),
-        };
-    },
-    methods: {
-        deleteChat(chat: Chat) {
-            if (!chat.id) return;
-            db.chats.delete(chat.id);
-            db.messages.where("chatId").equals(chat.id).delete();
-        },
-        trunc(str: string, num: number) {
-            return str.length > num ? str.slice(0, num - 1) + "..." : str;
-        },
-    },
-};
+});
+
+function deleteChat(chat: Chat) {
+    db.deleteChat(chat.id);
+    if (Number(route.params.id) === chat.id) {
+        router.replace("/");
+    }
+}
+
+const chats = db.getChats((q) =>
+    q.orderBy("createdAt").reverse().limit(10).toArray(),
+);
 </script>
 
 <template>
     <div class="drawer lg:drawer-open">
         <input id="sidebar" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content min-h-screen">
+        <div class="drawer-content flex min-h-screen flex-col">
+            <nav v-if="model" class="navbar">
+                <div class="flex-none">
+                    <label
+                        for="sidebar"
+                        class="btn btn-square btn-ghost lg:hidden"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            class="inline-block h-5 w-5 stroke-current"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            ></path>
+                        </svg>
+                    </label>
+                </div>
+                <div class="flex-1 text-xl">
+                    <button class="btn btn-ghost text-xl">
+                        {{ model }}
+                    </button>
+                </div>
+            </nav>
             <slot />
         </div>
         <div class="drawer-side">
@@ -55,18 +73,13 @@ export default {
                 </button>
                 <ul class="menu w-64 flex-1">
                     <li class="mb-2">
-                        <Link
-                            :disabled="route().current('chat.index')"
-                            class="btn btn-outline btn-sm"
-                            :href="route('chat.index')"
-                        >
+                        <router-link class="btn btn-outline btn-sm" to="/">
                             + New Chat
-                        </Link>
+                        </router-link>
                     </li>
                     <li v-for="chat in chats" :key="chat.id" class="group">
-                        <Link
-                            :disabled="route().current('chat.show', chat.id)"
-                            :href="route('chat.show', chat.id)"
+                        <router-link
+                            :to="`/chat/${chat.id}`"
                             class="flex rounded-lg"
                         >
                             <span class="flex-1">
@@ -79,7 +92,7 @@ export default {
                             >
                                 <TrashIconSvg class="h-4 fill-current" />
                             </button>
-                        </Link>
+                        </router-link>
                     </li>
                 </ul>
             </div>

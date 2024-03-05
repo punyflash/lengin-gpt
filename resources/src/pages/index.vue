@@ -1,55 +1,34 @@
-<script lang="ts">
+<script setup lang="ts">
 import { ref } from "vue";
 import ChatLayout from "@/components/Layouts/Chat.vue";
-import Navbar from "@/components/Chats/Navbar.vue";
 import SendIconSvg from "@/components/SVG/SendIcon.svg.vue";
-import db from "@/database";
+import { router, database } from "@/utils";
 
-export default {
-    components: { Navbar, SendIconSvg },
-    props: { model: String },
-    layout: ChatLayout,
-    setup: () => ({
-        message: ref(""),
-        loading: ref(false),
-    }),
-    methods: {
-        resize(el: HTMLTextAreaElement, max: number = 300) {
-            el.style.height = "auto";
-            const height = el.scrollHeight > max ? max : el.scrollHeight;
-            el.style.height = `${height}px`;
-        },
-        async submit() {
-            if (!this.message) return;
+const message = ref("");
+const loading = ref(false);
 
-            this.loading = true;
+function resize(el: HTMLTextAreaElement, max: number = 300) {
+    el.style.height = "auto";
+    const height = el.scrollHeight > max ? max : el.scrollHeight;
+    el.style.height = `${height}px`;
+}
 
-            const createdAt = Date.now();
+async function submit() {
+    if (!message.value) return;
 
-            const chatId = await db.chats.add({
-                name: this.message,
-                createdAt,
-            });
+    loading.value = true;
 
-            await db.messages.add({
-                chatId,
-                createdAt,
-                role: "user",
-                content: this.message,
-            });
+    const { chatId } = await database.createChat({
+        content: message.value,
+        role: "user",
+    });
 
-            this.message = "";
-            this.loading = false;
-        },
-    },
-};
+    router.push(`/chat/${chatId}`);
+}
 </script>
 
 <template>
-    <div class="flex h-full flex-col">
-        <Navbar>
-            <button class="btn btn-ghost text-xl">{{ model }}</button>
-        </Navbar>
+    <ChatLayout>
         <main class="flex flex-1 items-center justify-center p-4">
             <div
                 class="container flex h-full flex-col lg:max-w-2xl xl:max-w-3xl"
@@ -81,5 +60,5 @@ export default {
                 </form>
             </div>
         </main>
-    </div>
+    </ChatLayout>
 </template>

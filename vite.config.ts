@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import eslint from 'vite-plugin-eslint';
+import router from 'unplugin-vue-router/vite'
 import path from "path";
 
 export default defineConfig({
@@ -10,6 +11,10 @@ export default defineConfig({
             input: 'resources/src/app.ts',
             ssr: 'resources/src/ssr.ts',
             refresh: true,
+        }),
+        router({
+            routesFolder: 'resources/src/pages',
+            dts: 'resources/src/types/router.d.ts',
         }),
         vue({
             template: {
@@ -27,8 +32,6 @@ export default defineConfig({
     resolve: {
         alias: [
             { find: "@", replacement: path.resolve(process.cwd(), 'resources/src') },
-            { find: /~(.+)/, replacement: path.join(process.cwd(), 'node_modules/$1') },
-            { find: "ziggy", replacement: path.join(process.cwd(), 'vendor/tightenco/ziggy/src/js') },
         ]
     },
 });

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ChatsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +13,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::resource('chat', ChatsController::class)
-    ->only(['index', 'update', 'show']);
-Route::redirect('/', '/chat');
+Route::view('{any}', 'app')->where('any', '.*')->name('app');
