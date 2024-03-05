@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ChatLayout from "@/components/Layouts/Chat.vue";
 import SendIconSvg from "@/components/SVG/SendIcon.svg.vue";
 import { router, database } from "@/utils";
+import Chat from "@/components/Layouts/Chat.vue";
 
 const message = ref("");
 const loading = ref(false);
@@ -28,7 +28,7 @@ async function submit() {
 </script>
 
 <template>
-    <ChatLayout>
+    <Chat>
         <main class="flex flex-1 items-center justify-center p-4">
             <div
                 class="container flex h-full flex-col lg:max-w-2xl xl:max-w-3xl"
@@ -39,13 +39,13 @@ async function submit() {
                     <span class="loading loading-ring w-12 text-primary" />
                     How can I help you today?
                 </div>
-                <form class="relative" @submit.prevent="submit">
+                <form class="relative flex" @submit.prevent="submit">
                     <textarea
                         v-model="message"
                         @input="resize($event.target as HTMLTextAreaElement)"
                         @keydown.enter.exact.prevent="submit"
                         rows="1"
-                        class="textarea textarea-bordered w-full resize-none rounded-xl pr-12"
+                        class="textarea textarea-bordered w-full resize-none pr-12"
                         type="text"
                         required
                         placeholder="Type your message..."
@@ -60,5 +60,5 @@ async function submit() {
                 </form>
             </div>
         </main>
-    </ChatLayout>
+    </Chat>
 </template>

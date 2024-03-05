@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onUnmounted } from "vue";
 import LenginLogoSvg from "@/components/SVG/LenginLogo.svg.vue";
 import TrashIconSvg from "@/components/SVG/TrashIcon.svg.vue";
 import { router } from "@/utils";
@@ -7,6 +8,7 @@ import { trunc } from "@/utils/helpers";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
+const chats = ref([] as Chat[]);
 const { model } = defineProps({
     model: {
         type: String,
@@ -21,9 +23,26 @@ function deleteChat(chat: Chat) {
     }
 }
 
-const chats = db.getChats((q) =>
-    q.orderBy("createdAt").reverse().limit(10).toArray(),
-);
+const destroyChats = useChats();
+
+onUnmounted(() => {
+    destroyChats && destroyChats();
+});
+
+function useChats(unsubscribe: () => void = () => {}) {
+    unsubscribe && unsubscribe();
+
+    const query = db.getChats((q) =>
+        q.orderBy("createdAt").reverse().limit(10).toArray(),
+    );
+
+    query.subscribe({
+        next: (result) => (chats.value = result),
+    });
+
+    // @ts-expect-error ts(2551)
+    return query.unsubscribe as () => void;
+}
 </script>
 
 <template>

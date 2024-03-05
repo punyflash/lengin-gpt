@@ -1,4 +1,3 @@
-import { useObservable } from "@vueuse/rxjs";
 import Dexie, {
     liveQuery,
     type DexieOptions,
@@ -57,24 +56,18 @@ export class Database extends Dexie {
         });
     }
 
-    getChat(chatId: number) {
-        return this.chats.get(chatId);
+    async getChat(chatId: number) {
+        return await this.chats.get(chatId);
     }
 
     getChats(query?: Query<Chat, number> | undefined) {
-        return useObservable<Chat[], Chat[]>(
-            liveQuery(() =>
-                query ? query(this.chats) : this.chats.toArray(),
-            ) as any,
-            { initialValue: [] },
+        return liveQuery(() =>
+            query ? query(this.chats) : this.chats.toArray(),
         );
     }
     getMessages(query?: Query<Message, number> | undefined) {
-        return useObservable<Message[], Message[]>(
-            liveQuery(() =>
-                query ? query(this.messages) : this.messages.toArray(),
-            ) as any,
-            { initialValue: [] },
+        return liveQuery(() =>
+            query ? query(this.messages) : this.messages.toArray(),
         );
     }
 
