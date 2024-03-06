@@ -5,6 +5,7 @@ import database from "@/utils/database";
 import { resize } from "@/utils/helpers";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useHead } from "@unhead/vue";
 
 const router = useRouter();
 const message = ref("");
@@ -24,6 +25,10 @@ async function submit() {
         window.dispatchEvent(new CustomEvent("message:created", { detail }));
     });
 }
+
+useHead({
+    title: "New Chat",
+});
 </script>
 
 <template>

@@ -7,6 +7,7 @@ import db, { useObservable } from "@/utils/database";
 import { renderMarkdown, resize } from "@/utils/helpers";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useHead } from "@unhead/vue";
 
 const route = useRoute();
 const chatId = ref(Number(route.params.id));
@@ -58,6 +59,10 @@ async function handler(event: CustomEvent) {
         })
         .finally(() => (loading.value = undefined));
 }
+
+useHead({
+    title: () => messages.value[0]?.content || "New Chat",
+});
 
 watch(
     () => route.params.id,

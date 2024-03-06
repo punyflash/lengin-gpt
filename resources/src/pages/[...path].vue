@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import { useHead } from "@unhead/vue";
+
+useHead({
+    title: "Page Not Found",
+});
+</script>
+
 <template>
     <main
         class="flex min-h-screen items-center justify-center gap-2 bg-base-100 text-base-content antialiased"
