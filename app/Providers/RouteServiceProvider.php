@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
@@ -40,15 +41,15 @@ class RouteServiceProvider extends ServiceProvider
     {
         $identify = fn (Request $request) => $request->user()?->id ?: $request->ip();
 
-        RateLimiter::for('api', fn (Request $request) =>
-            Limit::perMinute(60)->by($identify($request))
-        );
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($identify($request)));
 
         if ($limit = config('openai.limit')) {
-            RateLimiter::for('openai', fn (Request $request) =>
-                Limit::perDay($limit)->by($identify($request))->response(
-                    fn() => redirect()->back()->with('error', trans("You've exceeded the maximum number of :limit requests per day allowed. Please come back tomorrow!", compact('limit'))),
-                )
+            RateLimiter::for('openai', fn (Request $request) => Limit::perDay($limit)->by($identify($request))->response(
+                fn () => new JsonResponse([
+                    'message' => trans("You've exceeded the maximum number of :limit requests per day allowed!", [
+                        'limit' => $limit,
+                    ]),
+                ], 429)),
             );
         }
     }

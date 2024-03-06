@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import SendIconSvg from "@/components/SVG/SendIcon.svg.vue";
-import { router, database } from "@/utils";
-import Chat from "@/components/Layouts/Chat.vue";
+import Chat from "@/layouts/Chat.vue";
+import database from "@/utils/database";
+import { resize } from "@/utils/helpers";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const message = ref("");
 const loading = ref(false);
-
-function resize(el: HTMLTextAreaElement, max: number = 300) {
-    el.style.height = "auto";
-    const height = el.scrollHeight > max ? max : el.scrollHeight;
-    el.style.height = `${height}px`;
-}
 
 async function submit() {
     if (!message.value) return;

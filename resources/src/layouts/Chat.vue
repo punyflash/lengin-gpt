@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue";
 import LenginLogoSvg from "@/components/SVG/LenginLogo.svg.vue";
 import TrashIconSvg from "@/components/SVG/TrashIcon.svg.vue";
-import { router } from "@/utils";
-import db, { type Chat } from "@/utils/database";
+import ThemeSelect from "@/components/ThemeSelect.vue";
+import type { Chat } from "@/types/app";
+import db, { useObservable } from "@/utils/database";
 import { trunc } from "@/utils/helpers";
-import { useRoute } from "vue-router";
+import { onUnmounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
+const { model } = defineProps({ model: { type: String, default: null } });
 const route = useRoute();
-const chats = ref([] as Chat[]);
-const { model } = defineProps({
-    model: {
-        type: String,
-        default: null,
-    },
-});
+const router = useRouter();
+const chats = useObservable(
+    db.getChats((q) => q.orderBy("createdAt").reverse().limit(10).toArray()),
+    [],
+);
 
 function deleteChat(chat: Chat) {
     db.deleteChat(chat.id);
@@ -23,33 +23,17 @@ function deleteChat(chat: Chat) {
     }
 }
 
-const destroyChats = useChats();
-
-onUnmounted(() => {
-    destroyChats && destroyChats();
-});
-
-function useChats(unsubscribe: () => void = () => {}) {
-    unsubscribe && unsubscribe();
-
-    const query = db.getChats((q) =>
-        q.orderBy("createdAt").reverse().limit(10).toArray(),
-    );
-
-    query.subscribe({
-        next: (result) => (chats.value = result),
-    });
-
-    // @ts-expect-error ts(2551)
-    return query.unsubscribe as () => void;
-}
+onUnmounted(() => chats.destroy());
 </script>
 
 <template>
-    <div class="drawer lg:drawer-open">
+    <div id="drawer" class="drawer lg:drawer-open">
         <input id="sidebar" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content flex min-h-screen flex-col">
-            <nav v-if="model" class="navbar">
+            <nav
+                v-if="model"
+                class="navbar sticky top-0 z-10 bg-base-100 drop-shadow"
+            >
                 <div class="flex-none">
                     <label
                         for="sidebar"
@@ -78,7 +62,7 @@ function useChats(unsubscribe: () => void = () => {}) {
             </nav>
             <slot />
         </div>
-        <div class="drawer-side">
+        <div class="drawer-side z-10">
             <label
                 for="sidebar"
                 aria-label="close sidebar"
@@ -114,6 +98,7 @@ function useChats(unsubscribe: () => void = () => {}) {
                         </router-link>
                     </li>
                 </ul>
+                <ThemeSelect />
             </div>
         </div>
     </div>

@@ -32,6 +32,7 @@ export default defineConfig({
     resolve: {
         alias: [
             { find: "@", replacement: path.resolve(process.cwd(), 'resources/src') },
+            { find: /~(.+)/, replacement: path.join(process.cwd(), 'node_modules/$1') },
         ]
     },
 });

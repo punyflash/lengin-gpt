@@ -3,9 +3,6 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Redirect;
-use Inertia\Inertia;
 use Throwable;
 
 class Handler extends ExceptionHandler

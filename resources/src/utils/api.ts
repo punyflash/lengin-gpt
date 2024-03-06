@@ -1,8 +1,5 @@
-import type { Message } from "./database";
-
-export interface ChatLoading extends Promise<Response> {
-    cancel: () => void;
-}
+import type { ChatLoading, Message } from "@/types/app";
+import swal from "sweetalert2";
 
 export function chat(
     messages: Message[],
@@ -10,8 +7,7 @@ export function chat(
 ): ChatLoading {
     const controller = new AbortController();
 
-    // @ts-expect-error ts(2741)
-    const response: ChatLoading = fetch("/api/chat", {
+    const response = fetch("/api/chat", {
         method: "POST",
         body: JSON.stringify({
             messages: messages.map(({ content, role }) => ({ content, role })),
@@ -26,13 +22,12 @@ export function chat(
                     ?.getAttribute("content") || "",
         },
     })
-        .then((res) => {
+        .then(async (res) => {
             if (res.ok)
                 return res.body
                     ?.pipeThrough(new TextDecoderStream())
                     .getReader();
-            res;
-            throw new Error("Network response was not ok.");
+            throw new Error((await res.json())?.message || "Unknown error");
         })
         .then((reader) =>
             reader?.read().then(function _pump({ done, value }): any {
@@ -42,7 +37,20 @@ export function chat(
 
                 return reader.read().then(_pump);
             }),
-        );
+        )
+        .catch((err: Error) => {
+            swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "error",
+                width: "fit-content",
+                timer: 5000,
+                showConfirmButton: false,
+                title: err?.message || err || "Unknown error",
+            });
+
+            throw err;
+        }) as ChatLoading;
 
     response.cancel = () => controller.abort();
 

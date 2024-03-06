@@ -4,10 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use OpenAI\Laravel\Facades\OpenAI;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class OpenAiController extends Controller
 {
+    public function __construct()
+    {
+        if (config('openai.limit')) {
+            $this->middleware('throttle:openai')->only('chat');
+        }
+    }
+
     public function chat(Request $request)
     {
         return response()->stream(function () use ($request) {

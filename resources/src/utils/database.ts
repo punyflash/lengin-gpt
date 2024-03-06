@@ -1,27 +1,12 @@
+import type { Chat, Message, ObservableRef, Query } from "@/types/app";
 import Dexie, {
     liveQuery,
     type DexieOptions,
-    type IndexableType,
+    type Observable,
+    type Subscription,
     type Table,
 } from "dexie";
-
-export interface Chat {
-    id?: number;
-    name: string;
-    createdAt?: number;
-}
-
-export interface Message {
-    id?: number;
-    chatId?: number;
-    role: string;
-    content: string;
-    createdAt?: number;
-}
-
-type Query<T = any, TKey = IndexableType> = (
-    query: Table<T, TKey>,
-) => Promise<T[]> | T[];
+import { ref } from "vue";
 
 export class Database extends Dexie {
     chats!: Table<Chat, number>;
@@ -84,3 +69,24 @@ export class Database extends Dexie {
 }
 
 export default new Database(import.meta.env.VITE_APP_NAME);
+
+export function useObservable<T>(
+    query: Observable<T>,
+    initialValue?: T,
+): ObservableRef<T> {
+    const value = ref(initialValue as T) as ObservableRef<T>;
+    let subscription: Subscription | undefined;
+
+    value.update = (query: Observable) => {
+        subscription?.unsubscribe();
+        subscription = query.subscribe({
+            next: (result) => (value.value = result),
+        });
+    };
+
+    value.destroy = () => subscription?.unsubscribe();
+
+    value.update(query);
+
+    return value;
+}
